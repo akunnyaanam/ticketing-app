@@ -44,6 +44,10 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    protected $attributes = [
+        'role' => RoleEnum::USER,
+    ];
+
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
