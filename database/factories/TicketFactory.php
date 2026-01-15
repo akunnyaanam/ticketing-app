@@ -21,7 +21,7 @@ class TicketFactory extends Factory
             'event_id' => \App\Models\Event::factory(),
             'type' => $this->faker->randomElement(TicketType::values()),
             'price' => $this->faker->randomNumber(2, true) * 10000,
-            'stock' => $this->faker->numberBetween(0, 200),
+            'stock' => $this->faker->numberBetween(10, 200),
         ];
     }
 }
