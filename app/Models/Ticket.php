@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @mixin IdeHelperTicket
+ */
 class Ticket extends Model
 {
     /** @use HasFactory<\Database\Factories\TicketFactory> */
