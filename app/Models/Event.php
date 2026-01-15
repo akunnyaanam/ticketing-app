@@ -12,4 +12,9 @@ class Event extends Model
 {
     /** @use HasFactory<\Database\Factories\EventFactory> */
     use HasFactory, SoftDeletes, DefaultGuarded;
+
+    public function tickets()
+    {
+        return $this->hasMany(Ticket::class);
+    }
 }
