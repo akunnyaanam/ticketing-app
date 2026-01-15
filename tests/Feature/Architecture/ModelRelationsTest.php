@@ -1,11 +1,5 @@
 <?php
 
-use App\Models\Category;
-use App\Models\Event;
-use App\Models\Order;
-use App\Models\OrderDetail;
-use App\Models\Ticket;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -16,26 +10,43 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Str;
+use Symfony\Component\Finder\Finder;
 
-$models = [
-    Order::class,
-    User::class,
-    Event::class,
-    Ticket::class,
-    OrderDetail::class,
-    Category::class,
-];
+$modelPath = __DIR__ . '/../../../app/Models';
+
+if (!is_dir($modelPath)) {
+    return;
+}
+
+$files = Finder::create()
+    ->in($modelPath)
+    ->files()
+    ->name('*.php');
+$models = [];
+
+foreach ($files as $file) {
+    $namespace = 'App\\Models';
+    $relativePath = $file->getRelativePathname();
+
+    $class = sprintf('\%s\%s', $namespace, strtr(substr($relativePath, 0, strrpos($relativePath, '.')), '/', '\\'));
+
+    if (class_exists($class) && is_subclass_of($class, Model::class) && !new ReflectionClass($class)->isAbstract()) {
+        $models[] = $class;
+    }
+}
+
+$models = array_unique($models);
 
 foreach ($models as $class) {
     $className = class_basename($class);
 
     // Test A: PSR-12 Class Naming
-    test("{$className} follows PSR-12 naming convention", function () use ($className) {
+    test("{$class} follows PSR-12 naming convention", function () use ($className) {
         expect($className)->toMatch('/^[A-Z][a-zA-Z0-9]*$/');
     });
 
     // Test B: Relation Validity (Naming & Data Integrity)
-    test("{$className} has valid relations data", function () use ($class) {
+    test("{$class} has valid relations data", function () use ($class) {
         try {
             $model = $class::factory()->create();
         } catch (Throwable $e) {
