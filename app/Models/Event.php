@@ -26,4 +26,9 @@ class Event extends Model
     {
         return $this->hasMany(Ticket::class);
     }
+
+    public function isEventUpcoming(): bool
+    {
+        return $this->date > now();
+    }
 }

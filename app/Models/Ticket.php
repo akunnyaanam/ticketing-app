@@ -26,4 +26,9 @@ class Ticket extends Model
     {
         return $this->belongsTo(Event::class);
     }
+
+    public function isTicketAvailable(): bool
+    {
+        return $this->available_quantity > 0;
+    }
 }
