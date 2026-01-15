@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Actions\Order\CalculateOrderDetailAction;
+use App\Models\OrderDetail;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -22,5 +24,12 @@ class OrderDetailFactory extends Factory
             'quantity' => $this->faker->numberBetween(1, 5),
             'sub_total' => 0,
         ];
+    }
+
+    public function configure(): static
+    {
+        return $this->afterCreating(function (OrderDetail $detail) {
+            CalculateOrderDetailAction::make()->handle($detail);
+        });
     }
 }
