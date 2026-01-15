@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\TicketType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,7 +19,7 @@ class TicketFactory extends Factory
     {
         return [
             'event_id' => \App\Models\Event::factory(),
-            'type' => $this->faker->randomElement(['REG', 'PRE']),
+            'type' => $this->faker->randomElement(TicketType::values()),
             'price' => $this->faker->randomNumber(2, true) * 10000,
             'stock' => $this->faker->numberBetween(0, 200),
         ];
