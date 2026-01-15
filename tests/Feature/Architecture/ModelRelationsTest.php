@@ -6,15 +6,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Str;
 use Symfony\Component\Finder\Finder;
 
-$modelPath = __DIR__ . '/../../../app/Models';
+$modelPath = __DIR__.'/../../../app/Models';
 
-if (!is_dir($modelPath)) {
+if (! is_dir($modelPath)) {
     return;
 }
 
@@ -30,7 +29,7 @@ foreach ($files as $file) {
 
     $class = sprintf('\%s\%s', $namespace, strtr(substr($relativePath, 0, strrpos($relativePath, '.')), '/', '\\'));
 
-    if (class_exists($class) && is_subclass_of($class, Model::class) && !new ReflectionClass($class)->isAbstract()) {
+    if (class_exists($class) && is_subclass_of($class, Model::class) && ! new ReflectionClass($class)->isAbstract()) {
         $models[] = $class;
     }
 }
@@ -50,7 +49,7 @@ foreach ($models as $class) {
         try {
             $model = $class::factory()->create();
         } catch (Throwable $e) {
-            $model = new $class();
+            $model = new $class;
         }
 
         scanAndCheckRelations($model);
@@ -81,8 +80,8 @@ function scanAndCheckRelations(Model $model): void
             } catch (QueryException $e) {
                 renderFriendlySqlError($model, $methodName, $e);
             } catch (Throwable $e) {
-                if (!str_contains($e->getMessage(), 'TYPO DETECTED')) {
-                    test()->fail("Logic Error in relation [{$methodName}]: " . $e->getMessage());
+                if (! str_contains($e->getMessage(), 'TYPO DETECTED')) {
+                    test()->fail("Logic Error in relation [{$methodName}]: ".$e->getMessage());
                 } else {
                     throw $e;
                 }
@@ -110,9 +109,9 @@ function checkRelationNaming(Model $model, string $methodName, Relation $relatio
                 '',
                 '  ⚠️  NAMING CONVENTION ERROR (GRAMMAR)',
                 '  ──────────────────────────────────────────',
-                '  Model       : ' . class_basename($model),
+                '  Model       : '.class_basename($model),
                 "  Function    : {$methodName}()",
-                '  Relation    : ' . class_basename($relation),
+                '  Relation    : '.class_basename($relation),
                 '  Analysis    : This relation returns multiple items (HasMany), but the name is Singular.',
                 "  Suggestion  : Change '{$methodName}' to Plural '{$pluralStandard}'.",
                 '  ──────────────────────────────────────────',
@@ -137,7 +136,7 @@ function checkRelationNaming(Model $model, string $methodName, Relation $relatio
             '',
             '  ⚠️  TYPO DETECTED',
             '  ──────────────────────────────────────────',
-            '  Model       : ' . class_basename($model),
+            '  Model       : '.class_basename($model),
             "  Function    : {$methodName}()",
             "  Target      : {$targetName}::class",
             "  Analysis    : Function name does not contain '{$targetName}', but is very similar to '{$expectedName}'.",
@@ -155,7 +154,7 @@ function checkRelationData(Model $model, string $methodName, Relation $relation)
     expect($relation->getRelated())->toBeInstanceOf(Model::class);
 
     // If model hasn't been saved (Factory failed), skip data check
-    if (!$model->exists) {
+    if (! $model->exists) {
         return;
     }
 
@@ -165,7 +164,7 @@ function checkRelationData(Model $model, string $methodName, Relation $relation)
     // Validate BelongsTo (Parent must exist if FK is set)
     if ($relation instanceof BelongsTo) {
         $foreignKey = $relation->getForeignKeyName();
-        if (!empty($model->{$foreignKey})) {
+        if (! empty($model->{$foreignKey})) {
             expect($loadedData)
                 ->not
                 ->toBeNull()
@@ -191,7 +190,7 @@ function renderFriendlySqlError(Model $model, string $methodName, QueryException
         '',
         '  INVALID RELATION CONFIGURATION (SQL ERROR)',
         '  ──────────────────────────────────────────',
-        '  Model       : ' . class_basename($model),
+        '  Model       : '.class_basename($model),
         "  Relation    : {$methodName}()",
         "  Error       : {$originalError}",
         '',
