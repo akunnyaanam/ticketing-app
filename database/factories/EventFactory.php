@@ -18,7 +18,7 @@ class EventFactory extends Factory
     {
         return [
             'user_id' => \App\Models\User::factory(),
-            'category_id' => \App\Models\Category::inRandomOrder()->first(),
+            'category_id' => \App\Models\Category::factory(),
             'title' => $this->faker->sentence(3),
             'description' => $this->faker->paragraph(4),
             'datetime' => $this->faker->dateTimeBetween('-1 week', '+1 week'),
