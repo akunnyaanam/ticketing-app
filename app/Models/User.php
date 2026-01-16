@@ -58,6 +58,11 @@ class User extends Authenticatable
         return $this->hasMany(Event::class);
     }
 
+    public function getBookingForEvent(Event $event): ?Order
+    {
+        return $this->orders()->where('event_id', $event->id)->first();
+    }
+
     /**
      * Get the attributes that should be cast.
      *
